@@ -42,7 +42,7 @@ export default function App() {
     <div className="min-h-screen bg-gray-50 text-black font-sans selection:bg-[#e4000b] selection:text-white pb-20">
       
       {/* HERO SECTION */}
-      <div className="bg-black text-white pt-16 pb-24 px-4 relative overflow-hidden">
+      <div className="bg-black text-white pt-18 pb-20 px-4 relative overflow-hidden">
         <img 
           src="https://i.imgur.com/V1ngU0s.jpeg" 
           alt="Estudiantes universitarios" 
@@ -51,7 +51,7 @@ export default function App() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
         <div className="max-w-7xl mx-auto relative z-10 text-center">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tighter mb-3 uppercase">
+          <h1 className="text-2xl md:text-2xl font-extrabold tracking-tighter mb-3 uppercase">
             Conoce la carrera que te 
             <span className="text-[#e4000b]"> hará despegar</span>
           </h1>
@@ -65,7 +65,7 @@ export default function App() {
 
       {/* SEARCH & FILTERS */}
       <div className="max-w-7xl mx-auto px-4 -mt-10 relative z-20">
-        <form onSubmit={handleSearch} className="bg-white p-3 md:p-4 shadow-xl rounded-xl border-t-4 border-[#e4000b]">
+        <form onSubmit={handleSearch} className="bg-white p-3 md:p-6 shadow-xl rounded-xl border-t-4 border-[#e4000b]">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
             
             <div className="md:col-span-1">
@@ -142,7 +142,7 @@ export default function App() {
                       <div className="text-[8px] font-bold text-gray-500 uppercase tracking-wider leading-none mb-1">
                         {career.area}
                       </div>
-                      <h3 className="text-xs sm:text-sm font-bold uppercase text-black leading-tight truncate">
+                      <h3 className="text-xs sm:text-sm font-bold uppercase text-black leading-tight truncate -mb-[10px]">
                         {career.name}
                       </h3>
                     </div>
@@ -165,14 +165,14 @@ export default function App() {
                     )}
                   </div>
 
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100 mt-auto">
-                    <div className="flex flex-col">
+                  {/* Stats & Action Grid */}
+                  <div className="grid grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-2 bg-gray-50 p-2 rounded-lg border border-gray-100 mt-auto items-stretch">
+                    <div className="flex flex-col min-w-0 justify-center">
                       <div className="text-[7px] font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">
                         Puestos <span className="text-gray-300 mx-0.5">|</span> Edades
                       </div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-xs font-black text-[#e4000b] leading-none">
+                      <div className="flex items-baseline gap-1.5 truncate">
+                        <span className="text-s font-black text-[#e4000b] leading-none">
                           {career.demand.toLocaleString('es-PE')}
                         </span>
                         <span className="text-gray-300 text-[9px]">|</span>
@@ -181,12 +181,12 @@ export default function App() {
                         </span>
                       </div>
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col min-w-0 justify-center">
                       <div className="text-[7px] font-bold text-gray-400 uppercase tracking-widest mb-1 truncate">
-                        Media <span className="text-gray-300 mx-0.5">|</span> Rangos
+                        Promedio <span className="text-gray-300 mx-0.5">|</span> Min - Max
                       </div>
-                      <div className="flex items-baseline gap-1.5">
-                        <span className="text-xs font-black text-black leading-none">
+                      <div className="flex items-baseline gap-1.5 truncate">
+                        <span className="text-s font-black text-black leading-none">
                           {formatCurrency(career.avg)}
                         </span>
                         <span className="text-gray-300 text-[9px]">|</span>
@@ -195,33 +195,33 @@ export default function App() {
                         </span>
                       </div>
                     </div>
-                  </div>
 
-                  {/* Action */}
-                  <div className="mt-1">
-                    {career.availability === 'not_available' || !career.href ? (
-                      <button
-                        disabled
-                        className="w-full px-3 py-1.5 font-bold uppercase tracking-wider text-[9px] transition-colors rounded-lg bg-gray-200 text-gray-500 cursor-not-allowed"
-                      >
-                        Ver detalle
-                      </button>
-                    ) : (
-                      <a
-                        href={career.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block w-full"
-                      >
-                        <button className={`w-full px-3 py-1.5 font-bold uppercase tracking-wider text-[9px] transition-colors rounded-lg ${
-                          career.isContinental
-                            ? 'bg-[#e4000b] text-white hover:bg-black'
-                            : 'bg-black text-white hover:bg-[#e4000b]'
-                        }`}>
+                    {/* Action */}
+                    <div className="flex-shrink-0 flex items-center">
+                      {career.availability === 'not_available' || !career.href ? (
+                        <button
+                          disabled
+                          className="h-full px-2 py-1 font-bold uppercase tracking-wider text-[8px] transition-colors rounded-md bg-gray-200 text-gray-500 cursor-not-allowed whitespace-nowrap flex items-center"
+                        >
                           Ver detalle
                         </button>
-                      </a>
-                    )}
+                      ) : (
+                        <a
+                          href={career.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block h-full"
+                        >
+                          <button className={`h-full px-2 py-1 font-bold uppercase tracking-wider text-[8px] transition-colors rounded-md whitespace-nowrap flex items-center justify-center ${
+                            career.isContinental
+                              ? 'bg-[#e4000b] text-white hover:bg-black'
+                              : 'bg-black text-white hover:bg-[#e4000b]'
+                          }`}>
+                            Ver detalle
+                          </button>
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))

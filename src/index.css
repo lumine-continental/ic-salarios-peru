@@ -3,3 +3,7 @@
 @theme {
   --font-sans: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
+
+.aver{
+  margin-bottom:12px !important;
+}
