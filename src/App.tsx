@@ -11,6 +11,7 @@ export default function App() {
   const [selectedArea, setSelectedArea] = useState<string>('');
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [showResults, setShowResults] = useState<boolean>(false);
+  const [sortBy, setSortBy] = useState<'demand' | 'salary'>('demand');
 
   // Get unique areas for the dropdown
   const areas = useMemo(() => {
@@ -20,12 +21,20 @@ export default function App() {
 
   // Filter data based on selections
   const filteredCareers = useMemo(() => {
-    return careers.filter(career => {
+    let result = careers.filter(career => {
       const matchesArea = selectedArea === '' || career.area === selectedArea;
       const matchesSearch = career.name.toLowerCase().includes(searchTerm.toLowerCase());
       return matchesArea && matchesSearch;
     });
-  }, [selectedArea, searchTerm]);
+
+    if (sortBy === 'demand') {
+      result.sort((a, b) => b.demand - a.demand);
+    } else if (sortBy === 'salary') {
+      result.sort((a, b) => b.avg - a.avg);
+    }
+
+    return result;
+  }, [selectedArea, searchTerm, sortBy]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -42,13 +51,13 @@ export default function App() {
       {/* HERO SECTION */}
       <div className="bg-black text-white pt-24 pb-36 px-4 relative overflow-hidden">
         <img 
-          src="https://icontinental.edu.pe/wp-content/uploads/2025/10/bg-lp-exp2025-wtxt.jpg" 
+          src="https://i.imgur.com/V1ngU0s.jpeg" 
           alt="Estudiantes universitarios" 
           className="absolute inset-0 w-full h-full object-cover opacity-40"
           referrerPolicy="no-referrer"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
-        <div className="max-w-5xl mx-auto relative z-10 text-center">
+        <div className="max-w-7xl mx-auto relative z-10 text-center">
           <h1 className="text-5xl md:text-2xl font-extrabold tracking-tighter mb-6 uppercase">
             Conoce la carrera que te 
             <span className="text-[#e4000b]"> hará despegar</span>
@@ -62,7 +71,7 @@ export default function App() {
       </div>
 
       {/* SEARCH & FILTERS */}
-      <div className="max-w-5xl mx-auto px-4 -mt-16 relative z-20">
+      <div className="max-w-7xl mx-auto px-4 -mt-16 relative z-20">
         <form onSubmit={handleSearch} className="bg-white p-6 md:p-8 shadow-2xl rounded-2xl border-t-8 border-[#e4000b]">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
             
@@ -84,13 +93,15 @@ export default function App() {
 
             <div className="md:col-span-1">
               <label className="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">
-                Ranking
+                Ordenar por
               </label>
               <select 
-                className="w-full border-2 border-gray-200 py-3 px-4 bg-transparent focus:outline-none transition-colors rounded-xl font-medium text-gray-400 cursor-not-allowed"
-                disabled
+                className="w-full border-2 border-gray-200 py-3 px-4 bg-transparent focus:outline-none focus:border-[#e4000b] transition-colors rounded-xl font-medium text-black cursor-pointer"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as 'demand' | 'salary')}
               >
-                <option value="NACIONAL">NACIONAL</option>
+                <option value="demand">Más demandadas</option>
+                <option value="salary">Mejor pagadas</option>
               </select>
             </div>
 
@@ -122,7 +133,7 @@ export default function App() {
 
       {/* RESULTS SECTION */}
       {showResults && (
-        <div className="max-w-5xl mx-auto px-4 py-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
+        <div className="max-w-7xl mx-auto px-4 py-16 animate-in fade-in slide-in-from-bottom-8 duration-700">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end mb-8 border-b-2 border-gray-200 pb-4 gap-4">
             <h2 className="text-3xl font-extrabold uppercase tracking-tight text-black">Resultados</h2>
             <span className="text-gray-500 font-bold uppercase tracking-wider text-sm bg-gray-100 px-4 py-2 rounded-full">
@@ -130,86 +141,109 @@ export default function App() {
             </span>
           </div>
 
-          <div className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {filteredCareers.length > 0 ? (
-              filteredCareers.map((career) => (
+              filteredCareers.map((career, index) => (
                 <div 
                   key={career.id} 
-                  className={`group bg-white p-5 sm:p-6 transition-all duration-300 hover:shadow-lg rounded-2xl border-2 ${
+                  className={`group bg-white p-5 sm:p-6 transition-all duration-300 hover:shadow-lg rounded-2xl border-2 flex flex-col h-full ${
                     career.isContinental 
                       ? 'border-[#e4000b] shadow-sm' 
                       : 'border-gray-100 hover:border-gray-300'
                   }`}
                 >
-                  <div className="flex flex-col md:flex-row items-start md:items-center gap-5">
-                    
-                    {/* Ranking */}
-                    <div className="flex-shrink-0 w-12 h-12 bg-gray-50 flex items-center justify-center rounded-full border border-gray-200 group-hover:border-gray-300 transition-colors hidden md:flex">
-                      <span className="text-xl font-black text-gray-400 group-hover:text-black transition-colors">
-                        #{career.ranking}
+                  {/* Header: Area & Ranking */}
+                  <div className="flex justify-between items-start mb-3">
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                      {career.area}
+                    </div>
+                    <div className="flex-shrink-0 w-8 h-8 bg-gray-50 flex items-center justify-center rounded-full border border-gray-200 group-hover:border-gray-300 transition-colors">
+                      <span className="text-sm font-black text-gray-400 group-hover:text-black transition-colors">
+                        #{index + 1}
                       </span>
                     </div>
+                  </div>
 
-                    {/* Info */}
-                    <div className="flex-grow min-w-0">
-                      <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
-                        {career.area}
+                  {/* Title & Badges */}
+                  <div className="flex-grow">
+                    <h3 className="text-lg sm:text-xl font-bold uppercase text-black leading-tight mb-2">
+                      {career.name}
+                    </h3>
+                    
+                    {/* Availability / Continental Badges */}
+                    {career.availability === 'available' && career.isContinental && (
+                      <div className="inline-flex items-center gap-1.5 mb-3 bg-[#e4000b] text-[white] text-[9px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+                        <GraduationCap size={14} />
+                        Disponible en Instituto Continental
                       </div>
-                      <h3 className="text-lg sm:text-xl font-bold uppercase text-black leading-tight truncate whitespace-normal">
-                        {career.name}
-                      </h3>
-                      
-                      {/* Availability / Continental Badges */}
-                      {career.availability === 'available' && career.isContinental && (
-                        <div className="inline-flex items-center gap-1.5 mt-2 bg-[#e4000b] text-[white] text-[8px]  font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider">
-                          <GraduationCap size={14} />
-                          Disponible en Instituto Continental
-                        </div>
-                      )}
+                    )}
 
-                      {career.availability === 'coming_soon' && (
-                        <div className="inline-flex items-center gap-1.5 mt-2 bg-black text-[white] text-[8px]  font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider">
-                          <GraduationCap size={14} />
-                          Próximamente
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap items-center gap-3 text-xs text-gray-500 font-medium mt-3">
-                        <span className="flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
-                          <MapPin size={12} /> Nacional
-                        </span>
-                        <span className="flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
-                          <Briefcase size={12} /> 18 a 29 años
-                        </span>
+                    {career.availability === 'coming_soon' && (
+                      <div className="inline-flex items-center gap-1.5 mb-3 bg-black text-[white] text-[9px] font-bold px-3 py-1.5 rounded-lg uppercase tracking-wider">
+                        <GraduationCap size={14} />
+                        Próximamente
                       </div>
+                    )}
+
+                    <div className="flex flex-wrap items-center gap-2 text-xs text-gray-500 font-medium mb-4">
+                      <span className="flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+                        <MapPin size={12} /> Nacional
+                      </span>
+                      <span className="flex items-center gap-1 bg-gray-50 px-2.5 py-1 rounded-md border border-gray-100">
+                        <Briefcase size={12} /> 18 a 29 años
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Footer: Stats & Action */}
+                  <div className="pt-4 border-t border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4 mt-auto">
+                    <div className="w-full sm:w-auto flex flex-row gap-6 items-center">
+                      {sortBy === 'demand' ? (
+                        <>
+                          <div>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                              Puestos Solicitados
+                            </p>
+                            <p className="text-xl font-black text-[#e4000b] leading-none">
+                              {career.demand.toLocaleString('es-PE')}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                              Año de estudio
+                            </p>
+                            <p className="text-sm font-bold text-gray-800">
+                              2026
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                              Ingreso Promedio
+                            </p>
+                            <p className="text-xl font-black text-[#e4000b] leading-none">
+                              {formatCurrency(career.avg)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
+                              Rango Salarial
+                            </p>
+                            <p className="text-sm font-bold text-gray-800">
+                              {formatCurrency(career.min)} - {formatCurrency(career.max)}
+                            </p>
+                          </div>
+                        </>
+                      )}
                     </div>
 
-                    {/* Salary Stats */}
-                    <div className="flex-shrink-0 flex flex-row md:flex-col justify-between md:justify-center w-full md:w-auto border-t md:border-t-0 border-gray-100 pt-4 md:pt-0 mt-3 md:mt-0 md:text-right gap-4 md:gap-0">
-                      <div>
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">
-                          Ingreso Promedio
-                        </p>
-                        <p className="text-xl sm:text-2xl font-black text-[#e4000b] leading-none">
-                          {formatCurrency(career.avg)}
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5 md:mt-2">
-                          Rango Salarial
-                        </p>
-                        <p className="text-xs font-bold text-gray-800">
-                          {formatCurrency(career.min)} - {formatCurrency(career.max)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Action */}
-                    <div className="flex-shrink-0 w-full md:w-auto mt-3 md:mt-0">
+                    <div className="w-full sm:w-auto">
                       {career.availability === 'not_available' || !career.href ? (
                         <button
                           disabled
-                          className="w-full md:w-auto px-5 py-3 font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-1.5 rounded-xl bg-gray-300 text-gray-600 cursor-not-allowed"
+                          className="w-full px-5 py-3 font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-1.5 rounded-xl bg-gray-300 text-gray-600 cursor-not-allowed"
                         >
                           Ver detalle <ChevronRight size={14} />
                         </button>
@@ -218,9 +252,9 @@ export default function App() {
                           href={career.href}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className={`inline-block w-full md:w-auto`}
+                          className="inline-block w-full"
                         >
-                          <button className={`w-full md:w-auto px-5 py-3 font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-1.5 rounded-xl ${
+                          <button className={`w-full px-5 py-3 font-bold uppercase tracking-wider text-xs transition-colors flex items-center justify-center gap-1.5 rounded-xl ${
                             career.isContinental
                               ? 'bg-[#e4000b] text-white hover:bg-black'
                               : 'bg-black text-white hover:bg-[#e4000b]'
@@ -230,12 +264,12 @@ export default function App() {
                         </a>
                       )}
                     </div>
-
                   </div>
+
                 </div>
               ))
             ) : (
-              <div className="text-center py-24 bg-white border-2 border-dashed border-gray-200 rounded-2xl">
+              <div className="text-center py-24 bg-white border-2 border-dashed border-gray-200 rounded-2xl md:col-span-2">
                 <p className="text-xl font-bold text-gray-400 uppercase tracking-wider">
                   No se encontraron carreras
                 </p>
